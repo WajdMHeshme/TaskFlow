@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProfileController;
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 
 
@@ -34,6 +39,6 @@ Route::get('user/{id}/tasks', [TaskController::class, 'getUserTasks']);
 Route::get('task/{id}/user', [UserController::class, 'getTasksUser']);
 
 Route::post('category', [CategoryController::class, 'store']);
-Route::get('category/{catID}/tasks' , [CategoryController::class , 'getCategoriesTask']);
+Route::get('category/{catID}/tasks', [CategoryController::class, 'getCategoriesTask']);
 Route::post('task/{taskId}/categories', [TaskController::class, 'addCategoriesToTask']);
 Route::get('task/{taskId}/categories', [CategoryController::class, 'getTaskCategories']);
