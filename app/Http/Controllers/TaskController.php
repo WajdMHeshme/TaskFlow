@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -14,12 +15,18 @@ class TaskController extends Controller
      * Display a listing of the resource.
      */
 
-
+    public function getAllTasks()
+    {
+        $tasks = Task::all();
+        return response()->json([
+            "tasks" => $tasks
+        ]);
+    }
 
     public function index()
     {
-        $tasks = Task::all();
-        return response()->json($tasks);
+        $user_tasks = Auth::user()->tasks;
+        return response()->json($user_tasks);
     }
 
     /**
@@ -27,7 +34,10 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        $task = Task::create($request->validated());
+        $user_id = Auth::user()->id;
+        $validatedData = $request->validated();
+        $validatedData['user_id'] = $user_id;
+        $task = Task::create($validatedData);
         return response()->json($task);
     }
 
@@ -46,6 +56,12 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, string $id)
     {
         $task = Task::findOrFail($id);
+        $user_id = Auth::user()->id;
+        if ($user_id !== $task->user_id) {
+            return response()->json([
+                "message" => "unauthorized",
+            ], 403);
+        }
         $task->update($request->validated());
         return response()->json($task);
     }
@@ -55,7 +71,13 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        $task = Task::find($id);
+        $task_id = Auth::user()->id;
+        $task = Task::findOrFail($id);
+        if ($task_id !== $task->user_id) {
+            return response()->json([
+                "message" => "unauthorized",
+            ], 403);
+        }
         $task->delete();
         return response()->json(null, 204);
     }
