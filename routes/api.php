@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
-use App\Models\Task;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -22,6 +24,8 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    Route::get('tasks/ordered' , [TaskController::class , 'getTasksByPriority']);
+
     Route::get('tasks', [TaskController::class, 'index']);
     Route::get('task/{id}', [TaskController::class, 'getTask']);
     Route::post('tasks', [TaskController::class, 'store']);
@@ -30,7 +34,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('tasks/all' , [TaskController::class , 'getAllTasks'])->middleware('checkRole');
 
+
+
+
+
     Route::apiResource('tasks', TaskController::class);
+
+
+
+    //favorites list
+    Route::post('task/{taskId}/favorite' , [TaskController::class , 'addTaskToFavorites']);
+    Route::delete('task/{taskId}/favorite' , [TaskController::class , 'deleteTaskFromFavorites']);
+    Route::get('favorites' , [TaskController::class , 'getFavoriteTasks']);
+
+
+
+
 
     Route::prefix('profile')->group(function () {
         Route::post('', [ProfileController::class, 'store']);

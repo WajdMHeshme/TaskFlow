@@ -15,6 +15,39 @@ class TaskController extends Controller
      * Display a listing of the resource.
      */
 
+    public function addTaskToFavorites($taskId)
+    {
+        Task::findOrFail($taskId);
+        Auth::user()->favoriteTasks()->syncWithoutDetaching($taskId);
+
+        return response()->json(
+            [
+                "message" => "Task added to favorites"
+            ],
+            201
+        );
+    }
+
+    public function deleteTaskFromFavorites($taskId)
+    {
+        Task::findOrFail($taskId);
+        Auth::user()->favoriteTasks()->detach($taskId);
+        return response()->json([
+            "message" => "Task removed from favorite list successfuly"
+        ]);
+    }
+
+
+    public function getFavoriteTasks()
+    {
+        $favoriteTasks = Auth::user()->favoriteTasks();
+        return response()->json([
+            "favorite tasks" => $favoriteTasks
+        ]);
+    }
+
+
+
     public function getAllTasks()
     {
         $tasks = Task::all();
@@ -22,6 +55,19 @@ class TaskController extends Controller
             "tasks" => $tasks
         ]);
     }
+
+    public function getTasksByPriority()
+    {
+        $tasks = Auth::user()
+            ->tasks()
+            ->orderByRaw("FIELD(priority, 'high', 'medium', 'low')")
+            ->get();
+
+        return response()->json([
+            "tasks" => $tasks
+        ]);
+    }
+
 
     public function index()
     {
@@ -69,11 +115,13 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
+
     public function destroy(string $id)
     {
-        $task_id = Auth::user()->id;
+        $user_id = Auth::user()->id;
         $task = Task::findOrFail($id);
-        if ($task_id !== $task->user_id) {
+        if ($user_id !== $task->user_id) {
             return response()->json([
                 "message" => "unauthorized",
             ], 403);
@@ -87,6 +135,7 @@ class TaskController extends Controller
         $tasks = User::find($id)->tasks;
         return response()->json($tasks);
     }
+
     public function addCategoriesToTask(Request $request, $taskId)
     {
         $task = Task::findOrFail($taskId);
