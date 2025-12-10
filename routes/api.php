@@ -24,7 +24,7 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanct
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('tasks/ordered' , [TaskController::class , 'getTasksByPriority']);
+    Route::get('tasks/ordered', [TaskController::class, 'getTasksByPriority']);
 
     Route::get('tasks', [TaskController::class, 'index']);
     Route::get('task/{id}', [TaskController::class, 'getTask']);
@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('task/{id}', [TaskController::class, 'update']);
     Route::delete('task/{id}', [TaskController::class, 'delete']);
 
-    Route::get('tasks/all' , [TaskController::class , 'getAllTasks'])->middleware('checkRole');
+    Route::get('tasks/all', [TaskController::class, 'getAllTasks'])->middleware('checkRole');
 
 
 
@@ -43,9 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     //favorites list
-    Route::post('task/{taskId}/favorite' , [TaskController::class , 'addTaskToFavorites']);
-    Route::delete('task/{taskId}/favorite' , [TaskController::class , 'deleteTaskFromFavorites']);
-    Route::get('favorites' , [TaskController::class , 'getFavoriteTasks']);
+    Route::post('task/{taskId}/favorite', [TaskController::class, 'addTaskToFavorites']);
+    Route::delete('task/{taskId}/favorite', [TaskController::class, 'deleteTaskFromFavorites']);
+    Route::get('favorites', [TaskController::class, 'getFavoriteTasks']);
 
 
 
@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('user/{id}/tasks', [TaskController::class, 'getUserTasks']);
     Route::get('task/{id}/user', [UserController::class, 'getTasksUser']);
+    Route::get('user', [UserController::class, 'getAuthUser']);
 
     Route::post('category', [CategoryController::class, 'store']);
     Route::get('category/{catID}/tasks', [CategoryController::class, 'getCategoriesTask']);

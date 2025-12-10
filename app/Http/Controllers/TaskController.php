@@ -40,7 +40,7 @@ class TaskController extends Controller
 
     public function getFavoriteTasks()
     {
-        $favoriteTasks = Auth::user()->favoriteTasks();
+        $favoriteTasks = Auth::user()->favoriteTasks()->get();
         return response()->json([
             "favorite tasks" => $favoriteTasks
         ]);

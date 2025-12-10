@@ -22,9 +22,10 @@ class StoreProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'string|min:2',
-            'bio' => 'string|min:5'
+            'name' => 'required|string|min:2',
+            'bio' => 'string|min:5',
+            'info' => 'string|max:512',
+            'image' => 'required|image|mimes:png,jpg,jpeg,gif,webp|max:2048'
         ];
     }
 }

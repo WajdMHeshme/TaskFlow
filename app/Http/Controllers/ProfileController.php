@@ -5,13 +5,20 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProfileRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Profile;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
     public function store(StoreProfileRequest $requset)
     {
-        $profile = Profile::create($requset->validated());
+        $user_id = Auth::user()->id;
+        $validatedData = $requset->validated();
+        $validatedData['user_id'] = $user_id;
+        if ($requset->hasFile('image')) {
+            $photo_path = $requset->file('image')->store('photos', 'public');
+            $validatedData['image'] = $photo_path;
+        }
+        $profile = Profile::create($validatedData);
         return response()->json([
             'message' => 'profile created successfuly',
             'profile' => $profile,
