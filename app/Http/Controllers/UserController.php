@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,9 +18,7 @@ class UserController extends Controller
     public function getAuthUser()
     {
         $user_id = Auth::user()->id;
-        $user = User::findOrFail($user_id);
-        return response()->json([
-            "user" => $user
-        ]);
+        $user = User::with('profile')->findOrFail($user_id);
+        return new UserResource($user);
     }
 }

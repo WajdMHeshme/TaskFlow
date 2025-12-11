@@ -6,6 +6,8 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\User;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -101,15 +103,31 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, string $id)
     {
-        $task = Task::findOrFail($id);
-        $user_id = Auth::user()->id;
-        if ($user_id !== $task->user_id) {
+
+        try {
+            $task = Task::findOrFail($id);
+            $user_id = Auth::user()->id;
+            if ($user_id !== $task->user_id) {
+                return response()->json([
+                    "message" => "unauthorized",
+                ], 403);
+            }
+            $task->update($request->validated());
+            return response()->json($task);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(
+                [
+                    "message" => "Task Not Found",
+                    "details" => $e->getMessage()
+                ],
+                404
+            );
+        } catch (Exception $e) {
             return response()->json([
-                "message" => "unauthorized",
-            ], 403);
+                "message" => "some thing wrong",
+                "details" => $e->getMessage()
+            ], 500);
         }
-        $task->update($request->validated());
-        return response()->json($task);
     }
 
     /**
@@ -119,15 +137,33 @@ class TaskController extends Controller
 
     public function destroy(string $id)
     {
-        $user_id = Auth::user()->id;
-        $task = Task::findOrFail($id);
-        if ($user_id !== $task->user_id) {
-            return response()->json([
-                "message" => "unauthorized",
-            ], 403);
+        try {
+            $user_id = Auth::user()->id;
+            $task = Task::findOrFail($id);
+            if ($user_id !== $task->user_id) {
+                return response()->json([
+                    "message" => "unauthorized",
+                ], 403);
+            }
+            $task->delete();
+            return response()->json(null, 204);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(
+                [
+                    "message" =>  "Task Not Found",
+                    "details" => $e->getMessage()
+                ],
+                404
+            );
+        } catch (Exception $e) {
+            response()->json(
+                [
+                    "message" => "some thing wrong",
+                    "details" => $e->getMessage()
+                ],
+                500
+            );
         }
-        $task->delete();
-        return response()->json(null, 204);
     }
 
     public function getUserTasks($id)

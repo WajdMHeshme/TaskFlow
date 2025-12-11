@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProfileRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,5 +47,11 @@ class ProfileController extends Controller
             'message' => 'profile updated successfuly',
             'profile' => $profile
         ]);
+    }
+
+    public function getProfile()
+    {
+        $profile = Auth::user()->profile;
+        return new ProfileResource($profile);
     }
 }
