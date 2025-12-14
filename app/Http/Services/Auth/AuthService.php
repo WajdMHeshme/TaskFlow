@@ -2,10 +2,12 @@
 
 namespace App\Http\Services\Auth;
 
+use App\Mail\WelcomeMail;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthService
 {
@@ -19,7 +21,7 @@ class AuthService
             'role' => $data['role'] ?? 'user',
             'password' => Hash::make($data['password'])
         ]);
-
+        Mail::to($user->email)->send(new WelcomeMail($user->name));
         return $user;
     }
 
